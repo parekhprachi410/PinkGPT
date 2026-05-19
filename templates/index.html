@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>PinkGPT</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>💗 PinkGPT</h1>
+
+        <div id="chat-box"></div>
+
+        <div class="input-area">
+
+            <input
+                type="text"
+                id="user-input"
+                placeholder="Type your message..."
+            >
+
+            <button onclick="sendMessage()">Send</button>
+
+        </div>
+
+    </div>
+
+<script>
+
+async function sendMessage()
+{
+    let input = document.getElementById("user-input");
+
+    let message = input.value;
+
+    if(message.trim() === "")
+    {
+        return;
+    }
+
+    let chatBox = document.getElementById("chat-box");
+
+    chatBox.innerHTML +=
+        `<div class="user-message">
+            <b>You:</b>
+            <div class="message-content">
+                ${message}
+            </div>
+        </div>`;
+
+    input.value = "";
+
+    let response = await fetch("/chat",
+    {
+        method: "POST",
+
+        headers:
+        {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(
+        {
+            message: message
+        })
+    });
+
+    let data = await response.json();
+
+    chatBox.innerHTML +=
+        `<div class="ai-message">
+            <b>AI:</b>
+            <div class="message-content">
+                ${marked.parse(data.reply)}
+            </div>
+        </div>`;
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+</script>
+
+</body>
+
+</html>
